@@ -15,6 +15,12 @@ node_modules/
 .env.production.local
 
 # ===========================
+# Firebase Config (contains API keys)
+# ===========================
+server/src/firebase.ts
+client/src/lib/firebase.ts
+
+# ===========================
 # Build Outputs
 # ===========================
 dist/
