@@ -15,8 +15,8 @@ const generateTokens = (userId: string) => {
 
 const cookieOptions = {
   httpOnly: true,
-  secure: true,      // Firebase Functions always runs on HTTPS
-  sameSite: "none" as const,  // Required for cross-origin requests
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {

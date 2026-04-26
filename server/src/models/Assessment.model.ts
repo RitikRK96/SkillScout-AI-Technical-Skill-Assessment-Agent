@@ -37,7 +37,7 @@ export class Assessment {
     const id = uuidv4();
     const docRef = doc(db, "assessments", id);
     const now = new Date().toISOString();
-    const assessmentData = { ...data, createdAt: now, updatedAt: now };
+    const assessmentData = deepStripUndefined({ ...data, createdAt: now, updatedAt: now });
     await setDoc(docRef, assessmentData);
     return new Assessment({ _id: id, ...assessmentData });
   }
@@ -69,7 +69,7 @@ export class Assessment {
     if (assessment) {
       const docRef = doc(db, "assessments", q._id);
       const now = new Date().toISOString();
-      const updateData = { ...update, updatedAt: now };
+      const updateData = deepStripUndefined({ ...update, updatedAt: now });
       await setDoc(docRef, updateData, { merge: true });
       if (options?.new) {
         return this.findOne(q);
@@ -83,6 +83,25 @@ export class Assessment {
     const { _id, id, ...data } = this;
     (data as any).updatedAt = new Date().toISOString();
     const docRef = doc(db, "assessments", _id || id);
-    await setDoc(docRef, data, { merge: true });
+    // Firestore rejects undefined values — strip them recursively
+    const cleanData = deepStripUndefined(data);
+    await setDoc(docRef, cleanData, { merge: true });
   }
 }
+
+// Recursively remove undefined values from objects/arrays for Firestore compatibility
+function deepStripUndefined(obj: any): any {
+  if (obj === null || obj === undefined) return null;
+  if (Array.isArray(obj)) return obj.map(deepStripUndefined);
+  if (typeof obj === "object" && !(obj instanceof Date)) {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = deepStripUndefined(value);
+      }
+    }
+    return result;
+  }
+  return obj;
+}
+
