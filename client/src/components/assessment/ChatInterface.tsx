@@ -13,9 +13,12 @@ const speak = (text: string, onEnd?: () => void) => {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 1;
   utterance.pitch = 1;
-  // Pick a good English voice if available
+  // Pick a good English female voice if available
   const voices = window.speechSynthesis.getVoices();
+  const femaleNames = ["Female", "Samantha", "Zira", "Victoria", "Karen", "Tessa", "Google UK English Female", "Google US English"];
   const preferred = voices.find(
+    (v) => v.lang.startsWith("en") && femaleNames.some(name => v.name.includes(name))
+  ) || voices.find(
     (v) => v.lang.startsWith("en") && v.name.includes("Google")
   ) || voices.find((v) => v.lang.startsWith("en"));
   if (preferred) utterance.voice = preferred;
@@ -104,7 +107,7 @@ export const ChatInterface = () => {
 
   const toggleListening = useCallback(() => {
     if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in this browser. Try Chrome.");
+      alert("Speech recognition is not supported in this browser. Try Chrome or Edge.");
       return;
     }
 
@@ -113,6 +116,9 @@ export const ChatInterface = () => {
       setListening(false);
       return;
     }
+
+    // Capture whatever is currently typed so we don't overwrite it
+    const baseText = input;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -124,10 +130,13 @@ export const ChatInterface = () => {
       for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
-      setInput(transcript);
+      
+      const space = baseText && !baseText.endsWith(" ") && transcript ? " " : "";
+      setInput(baseText + space + transcript);
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (e: any) => {
+      console.error("Speech recognition error:", e.error);
       setListening(false);
     };
 
@@ -136,9 +145,13 @@ export const ChatInterface = () => {
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
-  }, [listening]);
+    try {
+      recognition.start();
+      setListening(true);
+    } catch (err) {
+      console.error("Failed to start speech recognition:", err);
+    }
+  }, [listening, input]);
 
   const handleSend = () => {
     if (!input.trim() || streaming) return;
