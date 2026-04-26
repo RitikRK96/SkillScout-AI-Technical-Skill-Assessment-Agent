@@ -2,7 +2,13 @@
 
 SkillScout is a next-generation, AI-powered technical skill assessment platform. It allows users to upload a target Job Description and their current resume. The AI automatically maps the required skills, conducts a dynamic, conversational technical interview, and generates a comprehensive, week-by-week personalised learning roadmap to bridge any identified skill gaps.
 
-![SkillScout Dashboard Mockup](https://via.placeholder.com/1200x600?text=SkillScout+AI+Dashboard)
+## 📸 Screenshots
+
+![SkillScout Dashboard Mockup](/Images/Dashboard.png)
+![SkillScout Dashboard Completed](/Images/Dashboard2.png)
+![Skill Analysis](/Images/SkillAnalysis.png)
+![Assessment Results 1](/Images/AssessmentResults.png)
+![Assessment Results 2](/Images/AssessmentResults2.png)
 
 ## 🌟 Core Features
 

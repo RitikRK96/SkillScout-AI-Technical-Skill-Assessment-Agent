@@ -99,18 +99,19 @@ export const continueAssessment = async (
     (msg) => msg.skillBeingAssessed === currentSkill
   );
 
-  const historyStr = historyForSkill
-    .map((msg) => `${msg.role === "agent" ? "SkillScout" : "Candidate"}: ${msg.content}`)
-    .join("\n\n");
+  const systemPrompt = getContinueAssessmentSystemPrompt(SKILL_SCOUT_PERSONA);
 
-  const systemPrompt = getContinueAssessmentSystemPrompt(SKILL_SCOUT_PERSONA, historyStr);
+  const messages: any[] = [
+    { role: "system", content: systemPrompt },
+    ...historyForSkill.map((msg) => ({
+      role: msg.role === "agent" ? "assistant" : "user",
+      content: msg.content
+    }))
+  ];
 
   const stream = await getClient().chat.completions.create({
     model: getDeployment(),
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: "Continue the conversation." },
-    ],
+    messages: messages,
     max_tokens: 1024,
     stream: true,
   });

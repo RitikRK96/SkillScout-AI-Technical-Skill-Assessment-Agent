@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
@@ -7,7 +7,6 @@ import DashboardPage from "./pages/DashboardPage";
 import NewAssessmentPage from "./pages/NewAssessmentPage";
 import ResultsPage from "./pages/ResultsPage";
 import LandingPage from "./pages/LandingPage";
-import api from "./lib/axios";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -15,21 +14,8 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  const setUser = useAuthStore((state) => state.setUser);
   
-  // On mount, try to restore session from httpOnly cookie
-  useEffect(() => {
-    api.post("/auth/refresh")
-      .then((res) => {
-        // Server returns user info on successful refresh
-        if (res.data?.user) {
-          setUser(res.data.user);
-        }
-      })
-      .catch(() => {
-        // No valid session — user stays logged out, no action needed
-      });
-  }, []);
+  // Session state is managed by Zustand persist and axios interceptor
 
   return (
     <Router>

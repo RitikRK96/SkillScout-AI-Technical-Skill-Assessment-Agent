@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAssessmentStore } from "../store/useAssessmentStore";
 import { InputStage } from "../components/assessment/InputStage";
 import { SkillMapPreview } from "../components/assessment/SkillMapPreview";
@@ -22,6 +22,9 @@ const NewAssessmentPage = () => {
     }
   }, []);
 
+  const kickedOffScoring = useRef(false);
+  const kickedOffPlan = useRef(false);
+
   // Polling for scoring and plan_gen status
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -34,11 +37,11 @@ const NewAssessmentPage = () => {
         
         if (data.status === "complete") {
           navigate(`/assessment/${session._id}/results`);
-        } else if (data.status === "scoring" && session.status !== "scoring") {
-          // If we transitioned to scoring, kick off scoring API
+        } else if (data.status === "scoring" && !kickedOffScoring.current) {
+          kickedOffScoring.current = true;
           api.post(`/assessments/${session._id}/score`);
-        } else if (data.status === "plan_gen" && session.status !== "plan_gen") {
-          // If we transitioned to plan_gen, kick off plan_gen API
+        } else if (data.status === "plan_gen" && !kickedOffPlan.current) {
+          kickedOffPlan.current = true;
           api.post(`/assessments/${session._id}/generate-plan`);
         }
       } catch (error) {

@@ -105,15 +105,13 @@ they have had and what they found most challenging.
 `;
 
 export const getContinueAssessmentSystemPrompt = (
-  skillScoutSystem: string,
-  conversationHistoryStr: string
+  skillScoutSystem: string
 ) => `
 ${skillScoutSystem}
 
-Conversation so far:
-${conversationHistoryStr}
+IMPORTANT INSTRUCTION: You are SkillScout. ONLY generate your (SkillScout's) next response. NEVER generate the Candidate's response.
 
-IMPORTANT: At the END of your response, on a new line, output 
+At the END of your response, on a new line, output 
 exactly ONE of these control tokens - nothing else on that line:
   [CONTINUE]          <- need more signal, ask a follow-up
   [SKILL_COMPLETE]    <- you have sufficient signal to score this skill
