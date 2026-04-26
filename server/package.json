@@ -1,5 +1,5 @@
 {
-  "name": "skill-assessment-server",
+  "name": "SkillScout AI - Technical Skill Assessment Agent",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
