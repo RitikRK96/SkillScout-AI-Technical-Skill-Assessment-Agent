@@ -10,7 +10,7 @@ export const SkillProgressBar = () => {
 
   return (
     <div className="w-full bg-white/80 backdrop-blur-lg border-b border-gray-200/60 sticky top-0 z-20">
-      <div className="w-[80%] mx-auto py-4">
+      <div className="w-full px-3 sm:px-6 md:w-[85%] lg:w-[80%] md:px-0 mx-auto py-3 sm:py-4">
         {/* Top row: Title + Step Counter */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">

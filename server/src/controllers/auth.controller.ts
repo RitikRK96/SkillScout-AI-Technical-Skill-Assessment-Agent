@@ -13,6 +13,12 @@ const generateTokens = (userId: string) => {
   return { accessToken, refreshToken };
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,      // Firebase Functions always runs on HTTPS
+  sameSite: "none" as const,  // Required for cross-origin requests
+};
+
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, password } = req.body;
@@ -30,12 +36,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.cookie("accessToken", accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
+    res.cookie("accessToken", accessToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, { ...cookieOptions, path: "/" });
 
     res.status(201).json({ user: { id: user.id, name: user.name, email: user.email } });
-  } catch (error) {
-    res.status(500).json({ error: "Registration failed" });
+  } catch (error: any) {
+    console.error("[REGISTER ERROR]", error?.message, error?.code, error?.stack);
+    res.status(500).json({ error: "Registration failed", details: error?.message });
   }
 };
 
@@ -59,12 +66,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.cookie("accessToken", accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
+    res.cookie("accessToken", accessToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, { ...cookieOptions, path: "/" });
 
     res.status(200).json({ user: { id: user.id, name: user.name, email: user.email } });
-  } catch (error) {
-    res.status(500).json({ error: "Login failed" });
+  } catch (error: any) {
+    console.error("[LOGIN ERROR]", error?.message, error?.code, error?.stack);
+    res.status(500).json({ error: "Login failed", details: error?.message });
   }
 };
 
@@ -88,8 +96,8 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     user.refreshToken = tokens.refreshToken;
     await user.save();
 
-    res.cookie("accessToken", tokens.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" });
-    res.cookie("refreshToken", tokens.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
+    res.cookie("accessToken", tokens.accessToken, cookieOptions);
+    res.cookie("refreshToken", tokens.refreshToken, { ...cookieOptions, path: "/" });
 
     res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
@@ -108,7 +116,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     // Ignore verification errors on logout
   }
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken", { path: "/" });
+  res.clearCookie("accessToken", cookieOptions);
+  res.clearCookie("refreshToken", { ...cookieOptions, path: "/" });
   res.status(200).json({ success: true });
 };

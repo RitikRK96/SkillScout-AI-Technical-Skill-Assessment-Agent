@@ -187,7 +187,7 @@ export const ChatInterface = () => {
       
       {/* Chat Messages Area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="w-[80%] mx-auto py-6 space-y-5">
+        <div className="w-full px-3 sm:px-6 md:w-[85%] lg:w-[80%] md:px-0 mx-auto py-4 sm:py-6 space-y-4 sm:space-y-5">
           {currentSkillMessages.map((msg, idx) => {
             const isAgent = msg.role === "agent";
             
@@ -214,7 +214,7 @@ export const ChatInterface = () => {
                   )}
                   
                   <div
-                    className={`max-w-[70%] px-4 py-3 ${
+                    className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] px-3 sm:px-4 py-2.5 sm:py-3 ${
                       isAgent
                         ? "bg-white border border-gray-200/80 text-gray-800 rounded-2xl rounded-tl-md shadow-sm"
                         : "bg-indigo-600 text-white rounded-2xl rounded-tr-md shadow-md shadow-indigo-200/40"
@@ -266,7 +266,7 @@ export const ChatInterface = () => {
               <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center mt-1 shadow-md shadow-indigo-200/50">
                 <Bot className="w-4 h-4 text-white animate-pulse" />
               </div>
-              <div className="max-w-[70%] px-4 py-3 bg-white border border-gray-200/80 text-gray-800 rounded-2xl rounded-tl-md shadow-sm">
+              <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[70%] px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-200/80 text-gray-800 rounded-2xl rounded-tl-md shadow-sm">
                 <div className="text-[11px] font-bold text-indigo-500 mb-1.5 uppercase tracking-wider">SkillScout</div>
                 <div className="whitespace-pre-wrap leading-relaxed text-[15px]">
                   {streamingText}
@@ -296,13 +296,13 @@ export const ChatInterface = () => {
 
       {/* Input Area */}
       <div className="bg-white/80 backdrop-blur-lg border-t border-gray-200/60">
-        <div className="w-[80%] mx-auto py-4">
+        <div className="w-full px-3 sm:px-6 md:w-[85%] lg:w-[80%] md:px-0 mx-auto py-3 sm:py-4">
           <div className="flex gap-3 items-end">
             {/* Mic Button */}
             <Button
               type="button"
               onClick={toggleListening}
-              className={`h-[52px] w-[52px] shrink-0 rounded-xl transition-all ${
+              className={`h-10 w-10 sm:h-[52px] sm:w-[52px] shrink-0 rounded-xl transition-all ${
                 listening
                   ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-200/50 animate-pulse"
                   : "bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-sm"
@@ -321,8 +321,8 @@ export const ChatInterface = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={listening ? "🎤 Listening... speak now" : "Type your answer here... (Press Enter to send, Shift+Enter for newline)"}
-                className={`min-h-[52px] max-h-[200px] resize-none rounded-xl border-gray-200 bg-gray-50/80 pr-4 py-3.5 text-[15px] placeholder:text-gray-400 focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all ${
+                placeholder={listening ? "🎤 Listening..." : "Type your answer... (Enter to send)"}
+                className={`min-h-[44px] sm:min-h-[52px] max-h-[200px] resize-none rounded-xl border-gray-200 bg-gray-50/80 pr-4 py-3 sm:py-3.5 text-sm sm:text-[15px] placeholder:text-gray-400 focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all ${
                   listening ? "border-red-300 ring-2 ring-red-100 bg-red-50/30" : ""
                 }`}
                 disabled={streaming}
@@ -331,7 +331,7 @@ export const ChatInterface = () => {
 
             {/* Send Button */}
             <Button 
-              className="h-[52px] w-[52px] shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200/50 transition-all hover:shadow-xl hover:shadow-indigo-200/60 disabled:opacity-40 disabled:shadow-none"
+              className="h-10 w-10 sm:h-[52px] sm:w-[52px] shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200/50 transition-all hover:shadow-xl hover:shadow-indigo-200/60 disabled:opacity-40 disabled:shadow-none"
               onClick={handleSend}
               disabled={!input.trim() || streaming}
             >

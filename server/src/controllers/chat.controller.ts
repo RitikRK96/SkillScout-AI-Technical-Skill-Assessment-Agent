@@ -5,6 +5,8 @@ import { getAssessmentOpener, continueAssessment } from "../services/ai.service"
 import { initSSE, closeSSE, sendEvent } from "../utils/stream";
 import { ConversationMessage } from "@shared/types";
 
+const MAX_QUESTIONS_PER_SKILL = 4;
+
 export const chatStream = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { message } = req.query;
@@ -61,8 +63,14 @@ export const chatStream = async (req: AuthRequest, res: Response): Promise<void>
       await assessment.save();
     }
 
-    // Stream AI response
-    let rawResponse = await continueAssessment(assessment as any, res);
+    // Count how many user messages exist for the current skill
+    const userMessagesForSkill = assessment.conversationHistory.filter(
+      (msg: { skillBeingAssessed: any; role: string; }) => msg.skillBeingAssessed === currentSkill && msg.role === "user"
+    ).length;
+    const isLastQuestion = userMessagesForSkill >= MAX_QUESTIONS_PER_SKILL;
+
+    // Stream AI response (tell the AI this is the last exchange if limit reached)
+    let rawResponse = await continueAssessment(assessment as any, res, isLastQuestion);
     
     let controlToken = "";
     if (rawResponse.includes("[CONTINUE]")) controlToken = "[CONTINUE]";
@@ -78,6 +86,11 @@ export const chatStream = async (req: AuthRequest, res: Response): Promise<void>
       skillBeingAssessed: currentSkill,
       timestamp: new Date().toISOString(),
     });
+
+    // Force skill completion if we've hit the question limit
+    if (isLastQuestion && controlToken === "[CONTINUE]") {
+      controlToken = "[SKILL_COMPLETE]";
+    }
 
     if (controlToken === "[SKILL_COMPLETE]" || controlToken === "[NEXT_SKILL]") {
       assessment.currentSkillIndex += 1;

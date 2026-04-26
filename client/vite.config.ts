@@ -15,8 +15,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "https://api-lt6pmuur5q-uc.a.run.app",
         changeOrigin: true,
+        secure: true,
       },
     },
   },

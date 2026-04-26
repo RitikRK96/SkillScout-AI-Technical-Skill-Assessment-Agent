@@ -11,7 +11,7 @@ import { UploadCloud, FileText, ArrowRight, Briefcase, Building2, Sparkles, X, F
 export const InputStage = ({ assessmentId }: { assessmentId: string }) => {
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [jdMode, setJdMode] = useState<"text" | "file">("text");
+  const [jdMode] = useState<"text" | "file">("text");
   const [resumeMode, setResumeMode] = useState<"text" | "file">("file");
   const [jdText, setJdText] = useState("");
   const [resumeText, setResumeText] = useState("");

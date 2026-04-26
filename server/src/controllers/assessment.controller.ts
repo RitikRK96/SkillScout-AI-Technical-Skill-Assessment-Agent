@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { Assessment } from "../models/Assessment.model";
 import { upload } from "../middleware/upload.middleware";
-import { extractTextFromPDF } from "../services/parser.service";
+import { extractTextFromPDFBuffer } from "../services/parser.service";
 import { parseJDAndResume, scoreAllSkills, generateLearningPlan } from "../services/ai.service";
 
 export const getAssessments = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -69,7 +69,7 @@ export const uploadResume = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    const text = await extractTextFromPDF(file.path);
+    const text = await extractTextFromPDFBuffer(file.buffer);
 
     const assessment = await Assessment.findOneAndUpdate(
       { _id: req.params.id, userId: req.user?.id },

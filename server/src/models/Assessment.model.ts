@@ -1,38 +1,88 @@
-import { Schema, model, Document } from "mongoose";
+import { db } from "../firebase";
+import { collection, query, where, getDocs, doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { AssessmentSession } from "@shared/types";
+import { v4 as uuidv4 } from "uuid";
 
-// Type omit for _id as Document provides it
-export type IAssessment = Omit<AssessmentSession, "_id" | "createdAt" | "updatedAt"> & Document;
+export type IAssessment = Omit<AssessmentSession, "_id"> & { _id: string };
 
-const AssessmentSchema = new Schema<IAssessment>(
-  {
-    userId: { type: String, required: true, index: true },
-    status: {
-      type: String,
-      enum: ["input", "parsing", "skill_map", "assessing", "scoring", "plan_gen", "complete"],
-      required: true,
-    },
-    jobTitle: { type: String, default: "" },
-    companyName: { type: String, default: "" },
-    jobDescriptionRaw: { type: String },
-    resumeRaw: { type: String },
-    resumeFileName: { type: String },
-    parsedJD: { type: Schema.Types.Mixed },
-    parsedResume: { type: Schema.Types.Mixed },
-    skillsToAssess: [{ type: String }],
-    currentSkillIndex: { type: Number, default: 0 },
-    conversationHistory: [
-      {
-        role: { type: String, enum: ["agent", "user"], required: true },
-        content: { type: String, required: true },
-        skillBeingAssessed: { type: String },
-        timestamp: { type: String, required: true },
-      },
-    ],
-    skillScores: [{ type: Schema.Types.Mixed }],
-    learningPlan: { type: Schema.Types.Mixed },
-  },
-  { timestamps: true }
-);
+export class Assessment {
+  [key: string]: any;
 
-export const Assessment = model<IAssessment>("Assessment", AssessmentSchema);
+  constructor(data: any) {
+    Object.assign(this, data);
+    if (!this._id && this.id) {
+      this._id = this.id;
+    }
+  }
+
+  static find(q: { userId: string | any }) {
+    return {
+      sort: async (opts: any) => {
+        const assessmentsRef = collection(db, "assessments");
+        const qSnapshot = await getDocs(query(assessmentsRef, where("userId", "==", q.userId)));
+        let docs = qSnapshot.docs.map(document => new Assessment({ _id: document.id, ...document.data() }));
+        if (opts.createdAt === -1) {
+          docs.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+        }
+        return docs;
+      }
+    };
+  }
+
+  static async create(data: any): Promise<Assessment> {
+    const id = uuidv4();
+    const docRef = doc(db, "assessments", id);
+    const now = new Date().toISOString();
+    const assessmentData = { ...data, createdAt: now, updatedAt: now };
+    await setDoc(docRef, assessmentData);
+    return new Assessment({ _id: id, ...assessmentData });
+  }
+
+  static async findOne(q: { _id?: any; userId?: any; [key: string]: any }): Promise<Assessment | null> {
+    if (q._id) {
+      const docRef = doc(db, "assessments", q._id);
+      const document = await getDoc(docRef);
+      if (!document.exists()) return null;
+      const data = document.data() as any;
+      if (q.userId && data.userId !== q.userId) return null;
+      return new Assessment({ _id: document.id, ...data });
+    }
+    return null;
+  }
+
+  static async findOneAndDelete(q: { _id?: any; userId?: any; [key: string]: any }): Promise<Assessment | null> {
+    const assessment = await this.findOne(q);
+    if (assessment) {
+      const docRef = doc(db, "assessments", q._id);
+      await deleteDoc(docRef);
+      return assessment;
+    }
+    return null;
+  }
+
+  static async findOneAndUpdate(q: { _id?: any; userId?: any; [key: string]: any }, update: any, options?: any): Promise<Assessment | null> {
+    const assessment = await this.findOne(q);
+    if (assessment) {
+      const docRef = doc(db, "assessments", q._id);
+      const now = new Date().toISOString();
+      const updateData = { ...update, updatedAt: now };
+      await setDoc(docRef, updateData, { merge: true });
+      if (options?.new) {
+        return this.findOne(q);
+      }
+      return assessment;
+    }
+    return null;
+  }
+
+  async save(): Promise<void> {
+    const { _id, id, ...data } = this;
+    (data as any).updatedAt = new Date().toISOString();
+    const docRef = doc(db, "assessments", _id || id);
+    await setDoc(docRef, data, { merge: true });
+  }
+}

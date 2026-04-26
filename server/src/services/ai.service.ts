@@ -92,14 +92,20 @@ export const getAssessmentOpener = async (
 
 export const continueAssessment = async (
   session: AssessmentSession,
-  res: any // Express Response
+  res: any, // Express Response
+  isLastQuestion: boolean = false
 ): Promise<string> => {
   const currentSkill = session.skillsToAssess[session.currentSkillIndex];
   const historyForSkill = session.conversationHistory.filter(
     (msg) => msg.skillBeingAssessed === currentSkill
   );
 
-  const systemPrompt = getContinueAssessmentSystemPrompt(SKILL_SCOUT_PERSONA);
+  let systemPrompt = getContinueAssessmentSystemPrompt(SKILL_SCOUT_PERSONA);
+
+  // If this is the last allowed exchange, force the AI to wrap up
+  if (isLastQuestion) {
+    systemPrompt += `\n\nIMPORTANT: This is the FINAL exchange for this skill. You MUST wrap up your assessment now. Give a brief, warm closing remark for this skill and end with [SKILL_COMPLETE]. Do NOT use [CONTINUE].`;
+  }
 
   const messages: any[] = [
     { role: "system", content: systemPrompt },
