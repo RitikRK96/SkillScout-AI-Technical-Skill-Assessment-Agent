@@ -14,7 +14,8 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://localhost:5175",
   "https://skillscout-server.web.app",
-  "https://skillscout-server.firebaseapp.com"
+  "https://skillscout-server.firebaseapp.com",
+  "https://deccanai.ritik.world"
 ].filter(Boolean) as string[];
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));

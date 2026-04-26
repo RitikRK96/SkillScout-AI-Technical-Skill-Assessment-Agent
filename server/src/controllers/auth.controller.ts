@@ -15,8 +15,8 @@ const generateTokens = (userId: string) => {
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  secure: true,
+  sameSite: "none" as const,
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
