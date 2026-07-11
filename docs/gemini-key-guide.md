@@ -15,7 +15,8 @@ This guide explains how to get a **free** Gemini API key from Google AI Studio a
 3. **Click "Get API Key"**
    In the left sidebar or top navigation, click the **Get API key** (or **Create API key**) button.
    
-   ![Get API Key Button](https://raw.githubusercontent.com/google-gemini/gemini-api-quickstart/main/images/create_api_key.png) *Note: UI layout may vary slightly.*
+   > [!NOTE]  
+   > This button is typically located at the top of the left sidebar in Google AI Studio.
 
 4. **Create a Key**
    - Click **Create API key**.
