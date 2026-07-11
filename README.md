@@ -14,11 +14,14 @@ SkillScout is a next-generation, AI-powered technical skill assessment platform.
 
 ## 🌟 Core Features
 
-- **Smart Document Parsing**: Instantly extracts required skills from Job Descriptions and aligns them with candidate resumes using Azure OpenAI.
-- **Dynamic Conversational Assessment**: A live, conversational interview interface that probes for depth and understanding rather than just testing trivia. Uses Server-Sent Events (SSE) for real-time AI streaming. Each skill is limited to **4 focused questions** for a concise, efficient assessment.
+- **Smart Document Parsing**: Instantly extracts required skills from Job Descriptions and aligns them with candidate resumes using Azure OpenAI (or Google Gemini in Guest Mode).
+- **Dynamic Conversational Assessment**: A live, conversational interview interface that probes for depth and understanding rather than just testing trivia. Uses Server-Sent Events (SSE) for real-time AI streaming. Each skill is limited to **8 focused questions** for a comprehensive and deep assessment.
 - **Voice Capabilities**: Native browser Web Speech API integration for **Text-to-Speech (TTS)** and **Speech-to-Text (STT)**, allowing users to practice verbal interviews.
 - **Objective Scoring & Gap Analysis**: Scores demonstrated proficiency against job requirements on a 1-10 scale and identifies critical "Skill Gaps".
 - **Personalised Learning Plans**: Generates week-by-week actionable roadmaps, curated resources, and quick wins to help candidates reach interview readiness.
+- **Offline Guest Sandbox**: Fully functional offline client sandbox mode. Runs entirely in the browser, persisting all data to `localStorage`. No backend server or Azure credentials required to run.
+- **Direct Gemini API Integration**: Enter your own Google Gemini API key to run real AI-driven assessments entirely client-side, with built-in auto-retry on free-tier rate limits.
+- **Local Data Portability**: Export and import your local guest sandbox assessments as JSON files directly from the UI, bypassing browser storage limits.
 - **Premium UI/UX**: A highly polished, mobile-responsive interface built with Tailwind CSS, Shadcn UI, and smooth micro-interactions.
 - **PDF Export**: Downloadable, professional learning plan scorecards generated directly in the browser.
 - **Serverless Architecture**: Fully deployed on Firebase (Cloud Functions + Hosting) for zero-maintenance scalability.
@@ -87,12 +90,15 @@ To run the AI assessment, you must deploy an OpenAI model in Azure:
 3. Under **Deployments**, create a new deployment. Select the `gpt-4o-mini` model.
 4. Note your **Endpoint**, **API Key**, and exactly what you named your **Deployment**.
 
-### 3. Configure Guest Sandbox (Google Gemini)
+### 3. Configure Guest Sandbox (Google Gemini & Offline Processing)
 
-If you don't have Azure OpenAI or want to try the application instantly without setting up a backend:
-1. You can run in **Guest Sandbox Mode**.
-2. To use real AI instead of pre-packaged simulated responses, obtain a **Google Gemini API Key** from [Google AI Studio](https://aistudio.google.com/).
-3. Follow our detailed [Gemini API Key Generation Guide](docs/gemini-key-guide.md) for step-by-step instructions.
+If you don't have an active Azure OpenAI subscription or want to try the application instantly without deploying the backend:
+1. Click **Continue as Guest** on the login page to enter **Guest Sandbox Mode**.
+2. The application will run entirely in your browser using local storage:
+   - **Simulated Mode (No API Key)**: Walks you through the full assessment experience using realistic, pre-packaged mock responses.
+   - **Live AI Mode (With Gemini API Key)**: Paste your personal Google Gemini API Key in the **Settings** menu. All resume parsing, interview questioning, scoring, and roadmap generation will be processed by Gemini directly from your browser.
+3. To obtain a free Gemini API Key, follow our step-by-step [Gemini API Key Generation Guide](docs/gemini-key-guide.md).
+4. **Data Portability**: Since guest assessments reside in `localStorage`, use the **Export** and **Import** features in the Settings menu to backup, restore, or migrate your data.
 
 ### 4. Configure Firebase
 
