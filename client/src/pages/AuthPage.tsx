@@ -15,6 +15,7 @@ const AuthPage = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const setUser = useAuthStore((state) => state.setUser);
+  const setGuestMode = useAuthStore((state) => state.setGuestMode);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,6 +147,28 @@ const AuthPage = () => {
               ) : isLogin ? "Sign In" : "Create Account"}
             </Button>
           </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-gray-50 px-2 text-gray-500 font-semibold">Or sandbox mode</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 rounded-xl border-gray-200 bg-white hover:bg-slate-100 text-indigo-600 hover:text-indigo-700 text-base font-semibold shadow-sm transition-all"
+            onClick={() => {
+              setGuestMode(true);
+              toast.success("Welcome to Guest Sandbox!");
+              navigate("/dashboard");
+            }}
+          >
+            Continue as Guest
+          </Button>
 
           <div className="mt-6 text-center">
             <button

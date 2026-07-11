@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,19 +6,64 @@ import { Label } from "@/components/ui/label";
 import api from "../../lib/axios";
 import { useAssessmentStore } from "../../store/useAssessmentStore";
 import toast from "react-hot-toast";
-import { UploadCloud, FileText, ArrowRight, Briefcase, Building2, Sparkles, X, File } from "lucide-react";
+import { UploadCloud, FileText, ArrowRight, Briefcase, Building2, Sparkles, X, File, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const InputStage = ({ assessmentId }: { assessmentId: string }) => {
-  const [jobTitle, setJobTitle] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const navigate = useNavigate();
+  const isSubmitted = useRef(false);
+
+  const [jobTitle, setJobTitle] = useState(() => {
+    const saved = localStorage.getItem(`assessment-draft-${assessmentId}`);
+    if (saved) {
+      try { return JSON.parse(saved).jobTitle || ""; } catch { return ""; }
+    }
+    return "";
+  });
+
+  const [companyName, setCompanyName] = useState(() => {
+    const saved = localStorage.getItem(`assessment-draft-${assessmentId}`);
+    if (saved) {
+      try { return JSON.parse(saved).companyName || ""; } catch { return ""; }
+    }
+    return "";
+  });
+
   const [jdMode] = useState<"text" | "file">("text");
-  const [resumeMode, setResumeMode] = useState<"text" | "file">("file");
-  const [jdText, setJdText] = useState("");
-  const [resumeText, setResumeText] = useState("");
+
+  const [resumeMode, setResumeMode] = useState<"text" | "file">(() => {
+    const saved = localStorage.getItem(`assessment-draft-${assessmentId}`);
+    if (saved) {
+      try { return JSON.parse(saved).resumeMode || "file"; } catch { return "file"; }
+    }
+    return "file";
+  });
+
+  const [jdText, setJdText] = useState(() => {
+    const saved = localStorage.getItem(`assessment-draft-${assessmentId}`);
+    if (saved) {
+      try { return JSON.parse(saved).jdText || ""; } catch { return ""; }
+    }
+    return "";
+  });
+
+  const [resumeText, setResumeText] = useState(() => {
+    const saved = localStorage.getItem(`assessment-draft-${assessmentId}`);
+    if (saved) {
+      try { return JSON.parse(saved).resumeText || ""; } catch { return ""; }
+    }
+    return "";
+  });
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
   const { setSession } = useAssessmentStore();
+
+  useEffect(() => {
+    if (isSubmitted.current) return;
+    const draft = { jobTitle, companyName, jdText, resumeText, resumeMode };
+    localStorage.setItem(`assessment-draft-${assessmentId}`, JSON.stringify(draft));
+  }, [jobTitle, companyName, jdText, resumeText, resumeMode, assessmentId]);
 
   const handleStartAnalysis = async () => {
     if (!jobTitle || !companyName) {
@@ -47,6 +92,8 @@ export const InputStage = ({ assessmentId }: { assessmentId: string }) => {
       }
 
       const { data } = await api.post(`/assessments/${assessmentId}/parse`, payload);
+      isSubmitted.current = true;
+      localStorage.removeItem(`assessment-draft-${assessmentId}`);
       setSession(data);
     } catch (error: any) {
       console.error(error);
@@ -59,9 +106,20 @@ export const InputStage = ({ assessmentId }: { assessmentId: string }) => {
   const isFormValid = jobTitle && companyName && jdText && (resumeMode === 'file' ? resumeFile : resumeText);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
         
+        {/* Back Link */}
+        <div className="flex justify-start">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/dashboard")}
+            className="rounded-xl gap-2 text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center p-3 bg-indigo-100 rounded-full mb-4 shadow-sm">

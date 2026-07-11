@@ -87,14 +87,21 @@ To run the AI assessment, you must deploy an OpenAI model in Azure:
 3. Under **Deployments**, create a new deployment. Select the `gpt-4o-mini` model.
 4. Note your **Endpoint**, **API Key**, and exactly what you named your **Deployment**.
 
-### 3. Configure Firebase
+### 3. Configure Guest Sandbox (Google Gemini)
+
+If you don't have Azure OpenAI or want to try the application instantly without setting up a backend:
+1. You can run in **Guest Sandbox Mode**.
+2. To use real AI instead of pre-packaged simulated responses, obtain a **Google Gemini API Key** from [Google AI Studio](https://aistudio.google.com/).
+3. Follow our detailed [Gemini API Key Generation Guide](docs/gemini-key-guide.md) for step-by-step instructions.
+
+### 4. Configure Firebase
 
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/).
 2. Enable **Cloud Firestore** (create a database in test mode).
 3. Upgrade to the **Blaze plan** (pay-as-you-go — required for Cloud Functions).
 4. Update `server/src/firebase.ts` and `client/src/lib/firebase.ts` with your Firebase project config.
 
-### 4. Environment Variables
+### 5. Environment Variables
 
 Create a `.env` file in **both** the `server` and `client` directories.
 
@@ -124,7 +131,7 @@ VITE_API_URL=/api
 
 > The Vite dev server proxy (configured in `vite.config.ts`) forwards `/api` requests to the deployed Firebase Function URL during local development.
 
-### 5. Running Locally
+### 6. Running Locally
 
 You only need to run the **frontend** dev server. The Vite proxy forwards API calls to the deployed Firebase Cloud Function:
 
@@ -135,7 +142,7 @@ npm run dev
 
 The application will be available at `http://localhost:5173`.
 
-### 6. Deploying to Firebase
+### 7. Deploying to Firebase
 
 ```bash
 # Build the client first

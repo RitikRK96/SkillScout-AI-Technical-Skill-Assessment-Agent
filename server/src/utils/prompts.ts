@@ -117,8 +117,8 @@ exactly ONE of these control tokens - nothing else on that line:
   [SKILL_COMPLETE]    <- you have sufficient signal to score this skill
   [NEXT_SKILL]        <- transition naturally to the next skill
 
-Use [SKILL_COMPLETE] after 2-4 exchanges where you have clear signal.
-Never continue past 6 exchanges on a single skill - move on.
+Use [SKILL_COMPLETE] only after at least 6-7 exchanges where you have deep signal. Do NOT wrap up too quickly.
+Never continue past 10 exchanges on a single skill - move on.
 `;
 
 export const SCORER_SYSTEM_PROMPT = `

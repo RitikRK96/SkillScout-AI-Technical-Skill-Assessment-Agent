@@ -5,7 +5,7 @@ import { getAssessmentOpener, continueAssessment } from "../services/ai.service"
 import { initSSE, closeSSE, sendEvent } from "../utils/stream";
 import { ConversationMessage } from "@shared/types";
 
-const MAX_QUESTIONS_PER_SKILL = 4;
+const MAX_QUESTIONS_PER_SKILL = 8;
 
 export const chatStream = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
